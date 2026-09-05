@@ -1,8 +1,8 @@
-# fx-991CN X（Casio ClassWiz）模拟器（适用于HP Prime）
+# fx-Prime ———— 在HP Prime上使用fx-991 CN X
 
-一个自包含的MicroPython移植版本，基于**CasioEmuNeo**基础计算器模拟器，目标机型为**Casio fx-991CN X**（ClassWiz，硬件ID 4）。
+基于**CasioEmuNeo**基础计算器模拟器，目标机型为**Casio fx-991CN X**（ClassWiz，硬件ID 4）。
 
-所有与纯计算器无关的内容均已被剥离：调试器、ROP注入工具、反汇编视图、Lua脚本钩子和图形界面。保留的是真正的nX-U8 CPU内核、MMU、芯片组/外设逻辑以及LCD渲染——即一个可工作的基础计算器。
+所模拟真正的nX-U8 CPU内核、MMU、芯片组/外设逻辑以及LCD渲染。
 
 不使用任何第三方Python库。设备上的所有输入/输出均通过HP Prime的MicroPython解释器中内置的**hpprime**模块完成。
 
@@ -23,17 +23,10 @@
 
 ## 环境要求
 
-* 一台HP Prime计算器（或HP Prime虚拟计算器），已安装MicroPython固件。
-* 将fx-991CN X固件镜像放置于 `emulator/rom.bin`。
-  （Casio固件受版权保护；请自行获取。原项目不附带ROM。）
+* 一台HP Prime计算器（或HP Prime虚拟计算器），已安装MicroPython。
+* 将fx-991CN X ROM 放置于 `emulator/rom.bin`。
 
-## 在HP Prime上安装
-
-1. 将整个 `emulator` 文件夹连同固件镜像 `rom.bin` 一起复制到计算器的闪存中（例如放入 `HOME` 目录或Py脚本文件夹）。
-2. 在HP Prime MicroPython应用中，运行 `main.py` 模块：
-   `run("main.py")` 或 `run("emulator/main.py")`，具体取决于您放置文件的位置。
-
-计算器固件将启动，其LCD内容会绘制在Prime屏幕上。按下映射的按键即可驱动模拟键盘。
+启动后，其LCD内容会绘制在Prime屏幕上。按下映射的按键即可驱动模拟键盘。
 
 ## 工作原理
 
