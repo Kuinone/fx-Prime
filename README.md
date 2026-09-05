@@ -1,4 +1,4 @@
-# fx-Prime ———— 在HP Prime上使用fx-991 CN X
+# fx-Prime —— 在HP Prime上使用fx-991 CN X （Work In Progress...）
 
 基于**CasioEmuNeo**基础计算器模拟器，目标机型为**Casio fx-991CN X**（ClassWiz，硬件ID 4）。
 
