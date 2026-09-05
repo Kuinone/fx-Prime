@@ -70,27 +70,33 @@ class CPU(object):
 
     # ------------------------------------------------------------------
     def _setup_opcode_dispatch(self):
-        dispatch = [-1] * 0x10000
+        # Build a compact dispatch table.  The original code used two Python
+        # lists of 0x10000 entries (the kept 'dispatch' plus a per-source
+        # 'permutation' scratch list); together they need ~512 KB, which blows
+        # the HP Prime's MicroPython heap.  A bytearray of 0x10000 bytes is
+        # only 64 KB; the scratch list is eliminated entirely by
+        # enumerating the don't-care-bit subsets on the fly.
+        SENTINEL = 255
+        dispatch = bytearray([SENTINEL]) * 0x10000
         sources = OPCODE_SOURCES
+        if len(sources) >= SENTINEL:
+            raise RuntimeError('too many opcode sources for bytearray dispatch')
         for sidx, src in enumerate(sources):
             _func, hint, opcode, operands = src
             varying_bits = 0
             for _size, mask, shift in operands:
                 varying_bits |= mask << shift
-            permutation = [0] * 0x10000
-            count = 1
-            permutation[0] = opcode
-            checkbit = 0x8000
-            while checkbit:
-                if varying_bits & checkbit:
-                    for px in range(count):
-                        permutation[px + count] = permutation[px] | checkbit
-                    count <<= 1
-                checkbit >>= 1
-            for px in range(count):
-                idx = permutation[px]
-                if dispatch[idx] == -1:
+            base = opcode & ~varying_bits
+            # enumerate every value matching the pattern (all subsets of the
+            # don't-care bits) without allocating a 64 K scratch list
+            sub = 0
+            while True:
+                idx = base | sub
+                if dispatch[idx] == SENTINEL:
                     dispatch[idx] = sidx
+                sub = (sub - varying_bits) & varying_bits
+                if sub == 0:
+                    break
         self.dispatch = dispatch
 
     def set_memory_model(self, mm):
@@ -143,7 +149,7 @@ class CPU(object):
             self.impl_opcode = self._fetch()
             opc = self.impl_opcode
             sidx = dispatch[opc]
-            if sidx == -1:
+            if sidx == 255:   # 255 = 'no source' sentinel (see _setup_opcode_dispatch)
                 continue
             _func, hint, _code, operands = opcodes[sidx]
 
